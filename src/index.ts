@@ -1,10 +1,28 @@
-import { app } from './app';
+import dotenv from 'dotenv';
+dotenv.config();
 
-function startServer() {
-  //TODO: DB Connection
-  app.listen(3000, () => {
-    console.log('Server started on port:3000');
-  });
+import { app } from './app';
+import sequilize from './database/init';
+
+async function startServer() {
+  if (!process.env.DB_NAME) {
+    console.error('db name must be provided.');
+  }
+  if (!process.env.DB_USERNAME) {
+    console.error('db username must be provided.');
+  }
+  if (!process.env.DB_PASSWORD) {
+    console.error('db password must be provided');
+  }
+  try {
+    await sequilize.authenticate({ retry: { max: 3, timeout: 5000 } });
+    const port = process.env.PORT || 3000;
+    app.listen(port, () => {
+      console.log(`Server started on port ${port}`);
+    });
+  } catch (error) {
+    console.error('Unable to connect to the database:', error);
+  }
 }
 
 startServer();
