@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import { app } from './app';
-import sequilize from './database/init';
+import sequelize from './database/init';
 
 async function startServer() {
   if (!process.env.DB_NAME) {
@@ -15,7 +15,8 @@ async function startServer() {
     console.error('db password must be provided');
   }
   try {
-    await sequilize.authenticate({ retry: { max: 3, timeout: 5000 } });
+    await sequelize.authenticate({ retry: { max: 3, timeout: 5000 } });
+    await sequelize.sync({ alter: true });
     const port = process.env.PORT || 3000;
     app.listen(port, () => {
       console.log(`Server started on port ${port}`);

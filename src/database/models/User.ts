@@ -1,12 +1,13 @@
 import { Table, Model, DataType, CreatedAt, UpdatedAt, Column, HasMany } from 'sequelize-typescript';
-import Borrow from './Borrow';
+import { User, CreateUserAttributes } from '../../interfaces/User';
+import TransactionEntity from './Transaction';
 
 @Table({
   timestamps: true,
   tableName: 'users',
   modelName: 'User',
 })
-class User extends Model {
+class UserEntity extends Model<User, CreateUserAttributes> {
   @Column({
     primaryKey: true,
     type: DataType.UUID,
@@ -25,8 +26,8 @@ class User extends Model {
   @UpdatedAt
   declare updated_at: Date;
 
-  @HasMany(() => Borrow)
-  borrows!: Borrow[];
+  @HasMany(() => TransactionEntity)
+  transactions!: TransactionEntity[];
 }
 
-export default User;
+export default UserEntity;

@@ -1,13 +1,14 @@
 import { Table, Model, DataType, CreatedAt, UpdatedAt, Column, ForeignKey, BelongsTo } from 'sequelize-typescript';
-import Book from './Book';
-import User from './User';
+import BookEntity from './Book';
+import UserEntity from './User';
+import { Transaction, CreateTransactionAttributes } from '../../interfaces/Transaction';
 
 @Table({
   timestamps: true,
-  tableName: 'borrows',
-  modelName: 'Borrow',
+  tableName: 'Transactions',
+  modelName: 'Transaction',
 })
-class Borrow extends Model {
+class TransactionEntity extends Model<Transaction, CreateTransactionAttributes> {
   @Column({
     primaryKey: true,
     type: DataType.UUID,
@@ -15,13 +16,13 @@ class Borrow extends Model {
   })
   declare id: string;
 
-  @ForeignKey(() => User)
+  @ForeignKey(() => UserEntity)
   @Column({
     type: DataType.UUID,
   })
   declare user_id: string;
 
-  @ForeignKey(() => Book)
+  @ForeignKey(() => BookEntity)
   @Column({
     type: DataType.UUID,
   })
@@ -35,9 +36,10 @@ class Borrow extends Model {
 
   @Column({
     type: DataType.FLOAT,
-    defaultValue: 0,
+    allowNull: true,
+    defaultValue: null,
   })
-  declare rating: number;
+  declare score: number | null;
 
   @CreatedAt
   declare created_at: Date;
@@ -45,11 +47,11 @@ class Borrow extends Model {
   @UpdatedAt
   declare updated_at: Date;
 
-  @BelongsTo(() => User)
-  user!: User;
+  @BelongsTo(() => UserEntity)
+  user!: UserEntity;
 
-  @BelongsTo(() => Book)
-  book!: Book;
+  @BelongsTo(() => BookEntity)
+  book!: BookEntity;
 }
 
-export default Borrow;
+export default TransactionEntity;

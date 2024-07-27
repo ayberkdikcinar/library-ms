@@ -1,12 +1,13 @@
 import { Table, Model, DataType, CreatedAt, UpdatedAt, Column, HasMany } from 'sequelize-typescript';
-import Borrow from './Borrow';
+import TransactionEntity from './Transaction';
+import { Book, CreateBookAttributes } from '../../interfaces/Book';
 
 @Table({
   timestamps: true,
   tableName: 'books',
   modelName: 'Book',
 })
-class Book extends Model {
+class BookEntity extends Model<Book, CreateBookAttributes> {
   @Column({
     primaryKey: true,
     type: DataType.UUID,
@@ -20,7 +21,7 @@ class Book extends Model {
   declare name: string;
 
   @Column({
-    type: DataType.SMALLINT,
+    type: DataType.FLOAT,
   })
   declare average_rating: number;
 
@@ -30,8 +31,8 @@ class Book extends Model {
   @UpdatedAt
   declare updated_at: Date;
 
-  @HasMany(() => Borrow)
-  borrows!: Borrow[];
+  @HasMany(() => TransactionEntity)
+  transactions!: TransactionEntity[];
 }
 
-export default Book;
+export default BookEntity;
