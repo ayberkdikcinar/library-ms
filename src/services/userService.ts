@@ -60,6 +60,15 @@ async function borrowBook(transaction: CreateTransactionAttributes) {
 
 async function returnBook(data: UpdateTransactionAttributes): Promise<number> {
   const { user_id, book_id, is_returned, score } = data;
+
+  const transaction = await TransactionEntity.findOne({
+    where: { book_id, user_id },
+  });
+
+  if (transaction && transaction.is_returned) {
+    throw new BadRequestError('Book is already returned');
+  }
+
   const [affectedCount] = await TransactionEntity.update(
     { is_returned, score },
     { where: { book_id: book_id, user_id: user_id } }

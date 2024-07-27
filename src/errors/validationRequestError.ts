@@ -1,5 +1,5 @@
 import { CustomError } from './customError';
-import { ValidationError } from 'express-validator';
+import { FieldValidationError, ValidationError } from 'express-validator';
 
 export class RequestValidationError extends CustomError {
   statusCode = 400;
@@ -11,9 +11,15 @@ export class RequestValidationError extends CustomError {
 
   serializeErrors() {
     return this.errors.map((error) => {
+      if (error.type === 'field') {
+        return {
+          message: error.msg,
+          path: error.path,
+        };
+      }
       return {
         message: error.msg,
-        type: error.type,
+        path: 'unknown',
       };
     });
   }
