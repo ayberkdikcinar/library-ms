@@ -5,7 +5,7 @@ import { Transaction, CreateTransactionAttributes } from '../../interfaces/Trans
 
 @Table({
   timestamps: true,
-  tableName: 'Transactions',
+  tableName: 'transactions',
   modelName: 'Transaction',
 })
 class TransactionEntity extends Model<Transaction, CreateTransactionAttributes> {

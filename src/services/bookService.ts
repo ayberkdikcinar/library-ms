@@ -7,7 +7,7 @@ async function getBooks(): Promise<Book[]> {
 }
 
 async function getBookById(bookId: string): Promise<Book | null> {
-  return await BookEntity.findOne({ where: { id: bookId }, include: [BorrowEntity] });
+  return await BookEntity.findOne({ where: { id: bookId } });
 }
 
 async function createBook(book: CreateBookAttributes): Promise<Book> {
