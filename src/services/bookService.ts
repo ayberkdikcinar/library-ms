@@ -1,5 +1,6 @@
 import BookEntity from '../database/models/Book';
 import BorrowEntity from '../database/models/Transaction';
+import { NotFoundError } from '../errors/notFoundError';
 import { Book, CreateBookAttributes } from '../interfaces/Book';
 
 async function getBooks(): Promise<Book[]> {
@@ -7,7 +8,11 @@ async function getBooks(): Promise<Book[]> {
 }
 
 async function getBookById(bookId: string): Promise<Book | null> {
-  return await BookEntity.findOne({ where: { id: bookId } });
+  const book = await BookEntity.findOne({ where: { id: bookId } });
+  if (!book) {
+    throw new NotFoundError('Book is not exist.');
+  }
+  return book;
 }
 
 async function createBook(book: CreateBookAttributes): Promise<Book> {

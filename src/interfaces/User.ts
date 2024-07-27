@@ -14,7 +14,12 @@ interface CreateUserAttributes {
 interface UserResponseWithBorrows {
   name: string;
   currently_borrowed_books?: Book[];
-  borrowed_in_the_past?: Book[];
+  borrowed_in_the_past?: BorrowedInThePast[];
 }
 
-export { User, CreateUserAttributes, UserResponseWithBorrows };
+interface BorrowedInThePast {
+  score_given: number;
+  book: Book;
+}
+
+export { User, CreateUserAttributes, UserResponseWithBorrows, BorrowedInThePast };

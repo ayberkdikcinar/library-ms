@@ -1,4 +1,4 @@
-import { CreateUserAttributes, User, UserResponseWithBorrows } from '../interfaces/User';
+import { BorrowedInThePast, CreateUserAttributes, User, UserResponseWithBorrows } from '../interfaces/User';
 import UserEntity from '../database/models/User';
 import TransactionEntity from '../database/models/Transaction';
 import { CreateTransactionAttributes, UpdateTransactionAttributes } from '../interfaces/Transaction';
@@ -19,19 +19,19 @@ async function getUserById(userId: string): Promise<UserResponseWithBorrows | nu
   });
 
   if (!userWithTransaction) {
-    throw new NotFoundError('User not found');
+    throw new NotFoundError('User is not exist.');
   }
 
   const { borrowed_in_the_past, currently_borrowed_books } = userWithTransaction.transactions.reduce(
     (acc, transaction) => {
       if (transaction.is_returned === true) {
-        acc.borrowed_in_the_past.push(transaction?.book);
+        acc.borrowed_in_the_past.push({ score_given: Number(transaction.score), book: transaction?.book });
       } else {
         acc.currently_borrowed_books.push(transaction?.book);
       }
       return acc;
     },
-    { borrowed_in_the_past: [] as Book[], currently_borrowed_books: [] as Book[] }
+    { borrowed_in_the_past: [] as BorrowedInThePast[], currently_borrowed_books: [] as Book[] }
   );
 
   const userWithBorrowInfo: UserResponseWithBorrows = {
@@ -49,12 +49,25 @@ async function createUser(user: CreateUserAttributes): Promise<User> {
 }
 
 async function borrowBook(transaction: CreateTransactionAttributes) {
+  const isBookExist = await BookEntity.findByPk(transaction.book_id);
+
+  if (!isBookExist) {
+    throw new BadRequestError('Book is not exists with given id.');
+  }
+
+  const isUserExist = await UserEntity.findByPk(transaction.user_id);
+
+  if (!isUserExist) {
+    throw new BadRequestError('User is not exists with given id.');
+  }
+
   const isBookAlreadyBorrowed = await TransactionEntity.findOne({
     where: { book_id: transaction.book_id, is_returned: false },
   });
   if (isBookAlreadyBorrowed) {
     throw new BadRequestError('Book is already borrowed.');
   }
+
   return await TransactionEntity.create(transaction);
 }
 
@@ -62,11 +75,11 @@ async function returnBook(data: UpdateTransactionAttributes): Promise<number> {
   const { user_id, book_id, is_returned, score } = data;
 
   const transaction = await TransactionEntity.findOne({
-    where: { book_id, user_id },
+    where: { book_id, user_id, is_returned: false },
   });
 
-  if (transaction && transaction.is_returned) {
-    throw new BadRequestError('Book is already returned');
+  if (!transaction) {
+    throw new BadRequestError('Book is already returned.');
   }
 
   const [affectedCount] = await TransactionEntity.update(
