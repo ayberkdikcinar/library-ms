@@ -2,6 +2,8 @@ import { NextFunction, Request, Response } from 'express';
 import { CreateUserAttributes, User } from '../../interfaces/User';
 import { service } from '../../services/userService';
 import { CreateTransactionAttributes, UpdateTransactionAttributes } from '../../interfaces/Transaction';
+import { BadRequestError } from '../../errors/badRequestError';
+import { NotFoundError } from '../../errors/notFoundError';
 async function getUsers(req: Request, res: Response, next: NextFunction) {
   try {
     const response = await service.getUsers();
@@ -52,7 +54,10 @@ async function returnBook(req: Request, res: Response, next: NextFunction) {
       is_returned: true,
     };
     const response = await service.returnBook(newReturn);
-    return res.status(200).json(response);
+    if (!(response > 0)) {
+      throw new NotFoundError('Transaction could not be found.');
+    }
+    return res.status(200).json({ message: 'Book successfully returned.' });
   } catch (error) {
     next(error);
   }

@@ -6,6 +6,7 @@ import BookEntity from '../database/models/Book';
 import { BadRequestError } from '../errors/badRequestError';
 import { Book } from '../interfaces/Book';
 import { NotFoundError } from '../errors/notFoundError';
+
 async function getUsers(): Promise<User[]> {
   const users = await UserEntity.findAll();
   return users;
@@ -57,9 +58,23 @@ async function borrowBook(transaction: CreateTransactionAttributes) {
   return await TransactionEntity.create(transaction);
 }
 
-async function returnBook(data: UpdateTransactionAttributes) {
+async function returnBook(data: UpdateTransactionAttributes): Promise<number> {
   const { user_id, book_id, is_returned, score } = data;
-  return await TransactionEntity.update({ is_returned, score }, { where: { book_id: book_id, user_id: user_id } });
+  const [affectedCount] = await TransactionEntity.update(
+    { is_returned, score },
+    { where: { book_id: book_id, user_id: user_id } }
+  );
+
+  const transactions = await TransactionEntity.findAll({
+    where: { book_id, is_returned: true },
+  });
+
+  const totalScore = transactions.reduce((sum, transaction) => sum + transaction.score!, 0);
+  const averageRating = transactions.length ? totalScore / transactions.length : 0;
+
+  await BookEntity.update({ average_rating: averageRating }, { where: { id: book_id } });
+
+  return affectedCount;
 }
 
 export const service = { getUsers, getUserById, createUser, borrowBook, returnBook };
