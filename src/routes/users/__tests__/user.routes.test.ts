@@ -175,7 +175,7 @@ describe('Transaction tests', () => {
       (TransactionEntity.findOne as jest.Mock).mockResolvedValueOnce(null);
       const res = await request(app).post('/users/123/return/222').send({ score: 6 });
 
-      expect(res.body).toEqual({ errors: [{ message: 'Book is already returned.' }] });
+      expect(res.body).toEqual({ errors: [{ message: 'No book found to return.' }] });
       expect(res.status).toBe(400);
     });
   });
