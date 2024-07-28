@@ -79,7 +79,7 @@ async function returnBook(data: UpdateTransactionAttributes): Promise<number> {
   });
 
   if (!transaction) {
-    throw new BadRequestError('Book is already returned.');
+    throw new BadRequestError('No book found to return.');
   }
 
   const [affectedCount] = await TransactionEntity.update(

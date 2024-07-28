@@ -1,4 +1,14 @@
-import { Table, Model, DataType, CreatedAt, UpdatedAt, Column, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import {
+  Table,
+  Model,
+  DataType,
+  CreatedAt,
+  UpdatedAt,
+  Column,
+  ForeignKey,
+  BelongsTo,
+  Index,
+} from 'sequelize-typescript';
 import BookEntity from './Book';
 import UserEntity from './User';
 import { Transaction, CreateTransactionAttributes } from '../../interfaces/Transaction';
@@ -17,17 +27,20 @@ class TransactionEntity extends Model<Transaction, CreateTransactionAttributes> 
   declare id: string;
 
   @ForeignKey(() => UserEntity)
+  @Index('trans_user_id_index')
   @Column({
     type: DataType.UUID,
   })
   declare user_id: string;
 
   @ForeignKey(() => BookEntity)
+  @Index('trans_book_id_index')
   @Column({
     type: DataType.UUID,
   })
   declare book_id: string;
 
+  @Index('is_returned_index')
   @Column({
     type: DataType.BOOLEAN,
     defaultValue: false,

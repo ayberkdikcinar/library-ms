@@ -1,4 +1,4 @@
-CREATE TABLE books (
+CREATE TABLE IF NOT EXISTS "books" (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(), 
     name VARCHAR(255) NOT NULL,                    
     average_rating FLOAT DEFAULT NULL,              
@@ -6,7 +6,7 @@ CREATE TABLE books (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP 
 );
 
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS "users" (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(255) NOT NULL,                     
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -14,7 +14,7 @@ CREATE TABLE users (
 );
 
 
-CREATE TABLE transactions (
+CREATE TABLE IF NOT EXISTS "transactions" (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL,                        
     book_id UUID NOT NULL,                      
